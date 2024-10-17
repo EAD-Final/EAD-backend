@@ -322,22 +322,17 @@ namespace api.Controllers
             return Ok(new { product.ProductId, product.Name, product.Quantity });
         }
 
-        // Endpoint to update IsDeleted status
-        [HttpDelete("productDelete")]
-        public async Task<IActionResult> UpdateIsDeleted([FromBody] UpdateIsDeletedRequest request)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> UpdateIsDeleted(string productId)
         {
-
-
-            bool isProductInOrder = await _productRepository.IsProductInAnyOrderAsync(request.ProductId);
+            bool isProductInOrder = await _productRepository.IsProductInAnyOrderAsync(productId);
 
             if (isProductInOrder)
             {
                 return BadRequest(new { message = "Cannot delete this product as it is part of an existing order." });
             }
 
-
-            var success = await _productRepository.UpdateIsDeletedAsync(request.ProductId, request.VendorId, request.IsDeleted);
-
+            var success = await _productRepository.UpdateIsDeletedAsync(productId);
             if (success)
             {
                 return Ok(new { message = "Product deletion status updated successfully" });
@@ -349,7 +344,7 @@ namespace api.Controllers
         }
 
         // Endpoint to update product details
-        [HttpPut("update/{productId}")]
+        [HttpPatch("{productId}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] string productId, [FromForm] Product updatedProduct, List<IFormFile> newImages)
         {
             if (newImages != null && newImages.Count > 5)
@@ -383,10 +378,10 @@ namespace api.Controllers
 
     }
 
-    public class UpdateIsDeletedRequest
-    {
-        public string ProductId { get; set; } = null!;
-        public string VendorId { get; set; } = null!;
-        public bool IsDeleted { get; set; }
-    }
+    // public class UpdateIsDeletedRequest
+    // {
+    //     public string ProductId { get; set; } = null!;
+    //     public string VendorId { get; set; } = null!;
+    //     public bool IsDeleted { get; set; }
+    // }
 }

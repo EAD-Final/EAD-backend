@@ -60,7 +60,6 @@ namespace api.Services
             var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
             var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
 
-
             if (string.IsNullOrEmpty(awsAccessKeyId) || string.IsNullOrEmpty(awsSecretAccessKey))
             {
                 throw new InvalidOperationException("AWS credentials not found in environment variables.");
@@ -166,22 +165,22 @@ namespace api.Services
             return await _products.Find(p => p.Quantity <= threshold).ToListAsync();
         }
 
-
-
         // Update product details
         public async Task<bool> UpdateProductAsync(string productId, Product updatedProduct, List<Stream> newImageStreams = null)
         {
             var filter = Builders<Product>.Filter.Eq(p => p.ProductId, productId);
 
+            // Find the product first
             var product = await _products.Find(filter).FirstOrDefaultAsync();
             if (product == null)
             {
                 return false; // Product not found
             }
 
+            // Prepare the update definition to combine all updates
             var updateDef = Builders<Product>.Update.Combine();
 
-            // Update fields only if provided in the updatedProduct object
+            // Update only if the field is provided in the `updatedProduct` object
             if (!string.IsNullOrEmpty(updatedProduct.Name))
             {
                 updateDef = updateDef.Set(p => p.Name, updatedProduct.Name);
@@ -192,7 +191,7 @@ namespace api.Services
                 updateDef = updateDef.Set(p => p.Description, updatedProduct.Description);
             }
 
-            if (updatedProduct.Price != 0)
+            if (updatedProduct.Price > 0)  // Assuming 0 means not provided; adjust logic as per your requirements
             {
                 updateDef = updateDef.Set(p => p.Price, updatedProduct.Price);
             }
@@ -202,7 +201,7 @@ namespace api.Services
                 updateDef = updateDef.Set(p => p.CategoryId, updatedProduct.CategoryId);
             }
 
-            // Handle image update logic if new images are provided
+            // Handle image updates if new images are provided
             if (newImageStreams != null && newImageStreams.Count > 0)
             {
                 if (product.ImageUrls.Count + newImageStreams.Count > 5)
@@ -210,37 +209,32 @@ namespace api.Services
                     throw new InvalidOperationException("You cannot have more than 5 images for a product.");
                 }
 
-                // Remove excess images if necessary to keep the total count at 5
+                // Calculate how many images need to be removed to keep the total at 5
                 int removeCount = (product.ImageUrls.Count + newImageStreams.Count) - 5;
                 for (int i = 0; i < removeCount; i++)
                 {
-                    product.ImageUrls.RemoveAt(0);  // Remove from the front or oldest image
+                    product.ImageUrls.RemoveAt(0);  // Remove from the start or the oldest images
                 }
 
                 // Upload new images and add to ImageUrls
                 foreach (var stream in newImageStreams)
                 {
                     var fileName = $"{product.ProductId}_image_{Guid.NewGuid()}.jpg";
-                    var imageUrl = await UploadImageAsync(fileName, stream);
-                    product.ImageUrls.Add(imageUrl);
+                    var imageUrl = await UploadImageAsync(fileName, stream);  // UploadImageAsync handles image uploads
+                    product.ImageUrls.Add(imageUrl);  // Add new image URLs to the product's image list
                 }
 
-                // Add updated image URLs to the update definition
+                // Add the updated list of image URLs to the update definition
                 updateDef = updateDef.Set(p => p.ImageUrls, product.ImageUrls);
             }
 
+            // Execute the update with the combined update definition
             var result = await _products.UpdateOneAsync(filter, updateDef);
             return result.ModifiedCount > 0;
         }
 
 
-
-
-
-
-
         // Method to check if product is part of any order
-
         public async Task<bool> IsProductInAnyOrderAsync(string productId)
         {
             var filter = Builders<OrderItem>.Filter.Eq(oi => oi.ProductId, productId);
@@ -248,16 +242,16 @@ namespace api.Services
             return orderItem != null; // Returns true if product exists in any order
         }
 
-        // Update the IsDeleted 
-        public async Task<bool> UpdateIsDeletedAsync(string productId, string vendorId, bool isDeleted)
+        // Update the IsDeleted status for a product by productId
+        public async Task<bool> UpdateIsDeletedAsync(string productId)
         {
-            var filter = Builders<Product>.Filter.Eq(p => p.ProductId, productId) &
-                         Builders<Product>.Filter.Eq(p => p.VendorId, vendorId);
-            var update = Builders<Product>.Update.Set(p => p.IsDeleted, isDeleted);
+            var filter = Builders<Product>.Filter.Eq(p => p.ProductId, productId);
+            var update = Builders<Product>.Update.Set(p => p.IsDeleted, true);
 
             var result = await _products.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
         }
+
 
 
     }
