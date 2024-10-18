@@ -70,6 +70,7 @@ namespace api.Controllers
                 existingRating.DateModified = DateTime.UtcNow;
 
                 await _ratingRepository.UpdateRatingAsync(existingRating);
+                
             }
             else
             {
@@ -101,6 +102,11 @@ namespace api.Controllers
         public async Task<IActionResult> UpdateComment([FromBody] CommentDTO model)
         {
             var rating = await _ratingRepository.GetRatingByCustomerAndVendorAsync(model.CustomerId, model.VendorId);
+            var vendor = await _userRepository.GetUserByIdAsync(model.VendorId);
+            if (vendor == null || vendor.Role != "Vendor")
+            {
+                return BadRequest("Vendor not found or invalid.");
+            }
 
             if (rating == null)
             {
@@ -112,7 +118,18 @@ namespace api.Controllers
             rating.IsModified = true;
             rating.DateModified = DateTime.UtcNow;
 
+            
+
             await _ratingRepository.UpdateRatingAsync(rating);
+
+
+            var ArrayRating = vendor.Ratings.FirstOrDefault(r => r.CustomerId == model.CustomerId);
+            ArrayRating.Comment = model.NewComment;
+            ArrayRating.IsModified = true;
+            ArrayRating.DateModified = DateTime.UtcNow;
+
+            await _ratingRepository.UpdateVendorRatingAsync(model.VendorId, model.CustomerId, rating);
+            
 
             // **Invoke Firebase notification**
             // Send a notification to the vendor after the customer adds a rating/comment
