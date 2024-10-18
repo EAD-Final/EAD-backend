@@ -58,8 +58,7 @@ namespace api.Services
 
             // Retrieve AWS credentials from environment variables
             var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
-            var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
-
+var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
             if (string.IsNullOrEmpty(awsAccessKeyId) || string.IsNullOrEmpty(awsSecretAccessKey))
             {
                 throw new InvalidOperationException("AWS credentials not found in environment variables.");
@@ -200,6 +199,13 @@ namespace api.Services
             {
                 updateDef = updateDef.Set(p => p.CategoryId, updatedProduct.CategoryId);
             }
+
+            if (updatedProduct.Quantity > 0.0)  // Assuming 0 means not provided; adjust logic as per your requirements
+            {
+                updateDef = updateDef.Set(p => p.Quantity, updatedProduct.Quantity);
+            }
+
+            
 
             // Handle image updates if new images are provided
             if (newImageStreams != null && newImageStreams.Count > 0)
