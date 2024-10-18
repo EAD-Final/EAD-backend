@@ -29,7 +29,6 @@
  *         tokens and calling the SendNotificationAsync method for each token. It logs 
  *         a message for each token processed.
  * 
-
  */
 
 using FirebaseAdmin;
@@ -42,19 +41,19 @@ public class FirebaseService
 
     public FirebaseService()
     {
-        // InitializeFirebase();
+        InitializeFirebase();
     }
 
-    // private void InitializeFirebase()
-    // {
-    //     if (_firebaseApp == null)
-    //     {
-    //         _firebaseApp = FirebaseApp.Create(new AppOptions()
-    //         {
-    //             Credential = GoogleCredential.FromFile("/Users/SLIIT/Year 04/EAD/Assignment/Work/Repos/Backend/EAD-backend/api/ead-e-commerce-ee253-firebase-adminsdk-6aity-28ec1334ed.json")
-    //         });
-    //     }
-    // }
+    private void InitializeFirebase()
+    {
+        if (_firebaseApp == null)
+        {
+            _firebaseApp = FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile("/Users/kithminasiriwardana/Desktop/EAD-backend/api/ead-e-commerce-ee253-firebase-adminsdk-6aity-68ae0a8a32.json")
+            });
+        }
+    }
 
     // Method to send notification
     public async Task SendNotificationAsync(string token, string title, string body)

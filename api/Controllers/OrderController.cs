@@ -586,6 +586,45 @@ namespace api.Controllers
             return Ok(existingOrder);
         }
 
+        // Update order status without order item update
+
+        // [HttpPatch("updateStatus/{orderId}")]
+        // public async Task<IActionResult> UpdateOrderStatus(string orderId, [FromBody] UpdateStatusRequest request)
+        // {
+        //     // Fetch the existing order
+        //     var existingOrder = await _orderRepository.GetOrderByOrderIdAsync(orderId);
+        //     if (existingOrder == null)
+        //     {
+        //         return NotFound($"Order with ID {orderId} not found.");
+        //     }
+
+        //     // Check if the order status is not 'Dispatched' or 'Delivered'
+        //     if (existingOrder.Status == "Dispatched" || existingOrder.Status == "Delivered")
+        //     {
+        //         return BadRequest("Cannot update the order status as it has already been dispatched or delivered.");
+        //     }
+
+        //     // Update the status if changed
+        //     if (!string.IsNullOrEmpty(request.NewStatus))
+        //     {
+        //         existingOrder.Status = request.NewStatus;
+        //     }
+
+        //     // Update the note if present in the request
+        //     if (!string.IsNullOrEmpty(request.Note))
+        //     {
+        //         existingOrder.Note = request.Note;
+        //     }
+
+        //     // Update the UpdatedDate in memory
+        //     existingOrder.UpdatedDate = DateTime.Now;
+
+        //     // Save the updated order back to the repository
+        //     await _orderRepository.UpdateOrderStatusAsync(existingOrder);
+
+        //     return Ok(existingOrder);
+        // }
+
         // Update order status
         [HttpPatch("updateStatus/{orderId}")]
         public async Task<IActionResult> UpdateOrderStatus(string orderId, [FromBody] UpdateStatusRequest request)
@@ -607,6 +646,15 @@ namespace api.Controllers
             if (!string.IsNullOrEmpty(request.NewStatus))
             {
                 existingOrder.Status = request.NewStatus;
+
+                // Fetch order items for the order
+                var orderItems = await _orderItemRepository.GetOrderItemsByOrderIdAsync(orderId);
+
+                // Update the status of all order items
+                foreach (var item in orderItems)
+                {
+                    await _orderItemRepository.UpdateOrderItemStatusAsync(item.Id, request.NewStatus);
+                }
             }
 
             // Update the note if present in the request
@@ -623,6 +671,7 @@ namespace api.Controllers
 
             return Ok(existingOrder);
         }
+
 
         // // Update order status
         // [HttpPatch("updateStatus/{orderId}")]
