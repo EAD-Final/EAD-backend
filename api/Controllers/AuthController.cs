@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOs;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -170,5 +171,48 @@ namespace api.Controllers
                 return BadRequest(new { message = "Failed to approve customer" });
             }
         }
+
+
+
+        [HttpPut("updateProfile/{userId}")]
+        public async Task<IActionResult> UpdateProfile(string userId, [FromBody] UpdateProfileModel model)
+        {
+
+            if (model == null)  // Null-check to avoid exceptions
+            {
+                return BadRequest("Invalid request payload.");
+            }
+            // Check if the user exists
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Ensure the role and other restricted fields are not changed
+            if (model.Role != null || model.Ratings != null || model.Orders != null)
+            {
+                return BadRequest("Cannot change role, ratings, or orders.");
+            }
+
+            
+            string? passwordHash = null;
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                passwordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            }
+
+            // Call the repository to update the profile
+            await _userRepository.UpdateUserProfileAsync(
+                userId,
+                model.Email,
+                model.FullName,
+                passwordHash,
+                model.ContactInfo
+            );
+
+            return Ok("Profile updated successfully.");
+        }
+
     }
 }
