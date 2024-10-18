@@ -92,9 +92,9 @@ namespace api.Controllers
 
                 // Fetch category details
                 var category = await _categoryRepository.GetByCustomIdAsync(product.CategoryId);
-                if (category == null)
+                if (category == null || category.Status != "active" || category.isDeleted)
                 {
-                    return NotFound($"Category with ID {product.CategoryId} not found.");
+                    continue;
                 }
 
                 // Fetch vendor details
