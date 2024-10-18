@@ -35,6 +35,8 @@ namespace api.Services
     public class RatingRepository
     {
         private readonly IMongoCollection<Rating> _ratings;
+        private readonly IMongoCollection<ApplicationUser> _users;
+        
 
         public RatingRepository(IOptions<MongoDBSettings> mongoDBSettings)
         {
@@ -42,6 +44,8 @@ namespace api.Services
             var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
             _ratings = database.GetCollection<Rating>("Ratings");
+            _users = database.GetCollection<ApplicationUser>("Users");
+            
         }
 
 
@@ -81,6 +85,23 @@ namespace api.Services
         {
             await _ratings.ReplaceOneAsync(r => r.Id == rating.Id, rating);
         }
+
+        public async Task UpdateVendorRatingAsync(string vendorId, string customerId, Rating updatedRating)
+        {
+            var filter = Builders<ApplicationUser>.Filter.And(
+                Builders<ApplicationUser>.Filter.Eq(u => u.UserId, vendorId),
+                Builders<ApplicationUser>.Filter.ElemMatch(u => u.Ratings, r => r.CustomerId == customerId)
+            );
+        
+            var update = Builders<ApplicationUser>.Update
+                .Set("Ratings.$.Comment", updatedRating.Comment)
+                .Set("Ratings.$.IsModified", true)
+                .Set("Ratings.$.DateModified", updatedRating.DateModified);
+        
+            await _users.UpdateOneAsync(filter, update);
+        }
+
+
 
 
     }
