@@ -54,7 +54,7 @@ namespace api.Controllers
         private readonly OrderItemRepository _orderItemRepository;
         private readonly FCMTokenRepository _fCMTokenRepository;
 
-        private readonly FirebaseService _firebaseService;
+        // private readonly FirebaseService _firebaseService;
 
         public OrderController(ProductRepository productRepository, OrderRepository orderRepository, OrderItemRepository orderItemRepository, FCMTokenRepository fCMTokenRepository, FirebaseService firebaseService)
         {
@@ -62,7 +62,7 @@ namespace api.Controllers
             _orderRepository = orderRepository;
             _orderItemRepository = orderItemRepository;
             _fCMTokenRepository = fCMTokenRepository;
-            _firebaseService = firebaseService;
+            // _firebaseService = firebaseService;
         }
 
         // Method to generate a unique Order ID
@@ -130,10 +130,10 @@ namespace api.Controllers
                         string notificationTitle = "Stock Alert";
                         string notificationBody = $"Stock for product {product.Name} has dropped below {stockThreshold}. Current stock: {product.Quantity}";
 
-                        foreach (var token in vendorFcmTokens)
-                        {
-                            await _firebaseService.SendNotificationAsync(token, notificationTitle, notificationBody);
-                        }
+                        // foreach (var token in vendorFcmTokens)
+                        // {
+                        //     await _firebaseService.SendNotificationAsync(token, notificationTitle, notificationBody);
+                        // }
                     }
                 }
 
