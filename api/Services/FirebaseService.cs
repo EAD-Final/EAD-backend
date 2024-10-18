@@ -51,7 +51,7 @@ public class FirebaseService
         {
             _firebaseApp = FirebaseApp.Create(new AppOptions()
             {
-                Credential = GoogleCredential.FromFile("/app/api/ead-e-commerce-ee253-firebase-adminsdk-6aity-28ec1334ed.json")
+                Credential = GoogleCredential.FromFile("/ead-e-commerce-ee253-firebase-adminsdk-6aity-28ec1334ed.json")
             });
         }
     }
