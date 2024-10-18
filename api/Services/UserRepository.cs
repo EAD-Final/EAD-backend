@@ -94,6 +94,44 @@ namespace api.Services
             await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
         }
 
+
+        //update user profile
+        public async Task UpdateUserProfileAsync(string userId, string? email = null, string? fullName = null, string? passwordHash = null, string? contactInfo = null)
+        {
+            var filter = Builders<ApplicationUser>.Filter.Eq(u => u.UserId, userId);
+
+            
+            var update = Builders<ApplicationUser>.Update.Combine();
+
+            // Apply updates only for provided fields
+            if (!string.IsNullOrEmpty(email))
+            {
+                update = update.Set(u => u.Email, email);
+            }
+
+            if (!string.IsNullOrEmpty(fullName))
+            {
+                update = update.Set(u => u.FullName, fullName);
+            }
+
+            if (!string.IsNullOrEmpty(passwordHash))
+            {
+                update = update.Set(u => u.PasswordHash, passwordHash);
+            }
+
+            if (!string.IsNullOrEmpty(contactInfo))
+            {
+                update = update.Set(u => u.ContactInfo, contactInfo);
+            }
+
+            // Perform the update if there are any changes
+            if (update != Builders<ApplicationUser>.Update.Combine())
+            {
+                await _users.UpdateOneAsync(filter, update);
+            }
+        }
+
+
     }
 
 }
