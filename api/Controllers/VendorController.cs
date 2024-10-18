@@ -54,6 +54,7 @@ namespace api.Controllers
             {
                 vendor.UserId,
                 vendor.FullName,
+                vendor.Email,
                 vendor.ContactInfo,
                 vendor.AverageRating,
                 Ratings = vendor.Ratings.Select(r => new
@@ -81,6 +82,7 @@ namespace api.Controllers
             {
                 vendor.UserId,
                 vendor.FullName,
+                vendor.Email,
                 vendor.ContactInfo,
                 vendor.AverageRating,
                 Ratings = vendor.Ratings.Select(r => new
