@@ -117,6 +117,14 @@ namespace api.Controllers
             return Ok(customers);
         }
 
+        // Get all CSR
+        [HttpGet("csrs")]
+        public async Task<IActionResult> GetCSRs()
+        {
+            var csrs = await _userRepository.GetAllCSRAsync();
+            return Ok(csrs);
+        }
+
         //Generate unique User Id
         private async Task<string> GenerateUniqueUserIdAsync(string role)
         {

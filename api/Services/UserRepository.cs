@@ -88,6 +88,12 @@ namespace api.Services
             return await _users.Find(u => u.Role == "Customer").ToListAsync();
         }
 
+        //Get all CSR
+        public async Task<List<ApplicationUser>> GetAllCSRAsync()
+        {
+            return await _users.Find(u => u.Role == "CSR").ToListAsync();
+        }
+
         //Update user
         public async Task UpdateAsync(ApplicationUser user)
         {
