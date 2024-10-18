@@ -56,7 +56,7 @@ namespace api.Services
             _products = database.GetCollection<Product>(mongoDBSettings.Value.CollectionName);
             _orderItems = database.GetCollection<OrderItem>("OrderItems");
 
-            // Retrieve AWS credentials from environment variables
+            // Retrieve AWS credentials from environment variables //
             var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
             var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
 
