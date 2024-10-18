@@ -70,6 +70,8 @@ namespace api.Services
             return await _categories.Find(c => c.CategoryId == categoryId && !c.isDeleted).FirstOrDefaultAsync();
         }
 
+        
+
         // Create a new category
         public async Task CreateAsync(Category category)
         {
