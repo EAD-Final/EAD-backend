@@ -127,7 +127,7 @@ namespace api.Controllers
             if (!string.IsNullOrEmpty(vendorFcmToken))
             {
                 Console.WriteLine("Sending notification to vendor...");
-                await _firebaseService.SendNotificationAsync(vendorFcmToken, notificationTitle, notificationBody);
+                // await _firebaseService.SendNotificationAsync(vendorFcmToken, notificationTitle, notificationBody);
             }
 
             return Ok("Comment updated successfully.");
