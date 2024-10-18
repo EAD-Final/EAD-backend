@@ -29,7 +29,6 @@
  *         tokens and calling the SendNotificationAsync method for each token. It logs 
  *         a message for each token processed.
  * 
-
  */
 
 using FirebaseAdmin;
