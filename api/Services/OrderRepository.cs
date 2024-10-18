@@ -58,8 +58,11 @@ namespace api.Services
             await _orders.Find(o => o.OrderId == orderId).AnyAsync();
 
         // Get all orders
-        public async Task<List<Order>> GetAllOrdersAsync() =>
-            await _orders.Find(new BsonDocument()).ToListAsync();
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            var filter = Builders<Order>.Filter.Ne(o => o.Status, "Deleted");
+            return await _orders.Find(filter).ToListAsync();
+        }
 
         // Get order by custom Order ID
         public async Task<Order?> GetOrderByOrderIdAsync(string orderId)
