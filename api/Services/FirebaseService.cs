@@ -41,7 +41,7 @@ public class FirebaseService
 
     public FirebaseService()
     {
-        InitializeFirebase();
+        // InitializeFirebase();
     }
 
     private void InitializeFirebase()
