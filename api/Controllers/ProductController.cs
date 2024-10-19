@@ -101,7 +101,7 @@ namespace api.Controllers
                 var vendor = await _userRepository.GetUserByIdAsync(product.VendorId);
                 if (vendor == null)
                 {
-                    return NotFound($"Vendor with ID {product.VendorId} not found.");
+                    continue;
                 }
 
                 // Create a new ProductWithDetailsDTO
