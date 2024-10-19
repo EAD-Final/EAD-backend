@@ -96,16 +96,16 @@ namespace api.Controllers
             if (user.Role == "CSR") return Ok("User created. User can now login.");
             if (user.Role == "Vendor") return Ok("User created. User can now login.");
 
-            // After registering the customer, send notification to all CSRs
-            var csrFcmTokens = await _fCMTokenRepository.GetCsrFcmTokensAsync();
-            if (csrFcmTokens.Any())
-            {
-                Console.WriteLine("This if works");
-                var notificationTitle = "New Customer Registration";
-                var notificationBody = $"A new customer, {model.FullName}, has registered in the system.";
+            // // After registering the customer, send notification to all CSRs
+            // var csrFcmTokens = await _fCMTokenRepository.GetCsrFcmTokensAsync();
+            // if (csrFcmTokens.Any())
+            // {
+            //     Console.WriteLine("This if works");
+            //     var notificationTitle = "New Customer Registration";
+            //     var notificationBody = $"A new customer, {model.FullName}, has registered in the system.";
 
-                await _firebaseService.SendNotificationToCsrAsync(csrFcmTokens, notificationTitle, notificationBody);
-            }
+            //     await _firebaseService.SendNotificationToCsrAsync(csrFcmTokens, notificationTitle, notificationBody);
+            // }
             return Ok("User created. Pending approval from CSR.");
         }
 
@@ -203,7 +203,7 @@ namespace api.Controllers
                 return BadRequest("Cannot change role, ratings, or orders.");
             }
 
-            
+
             string? passwordHash = null;
             if (!string.IsNullOrEmpty(model.Password))
             {
