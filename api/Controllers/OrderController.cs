@@ -227,16 +227,125 @@ namespace api.Controllers
             return Ok(ordersResponse);
         }
 
-        // Get orders by role (Admin or Vendor)
+        // // Get orders by role (Admin or Vendor)
+        // [HttpGet("getByRole/{userId}")]
+        // public async Task<IActionResult> GetOrdersByUserRole(string userId)
+        // {
+        //     List<Order> allOrders;
+
+        //     // Check the first three letters of the userId to determine the role
+        //     if (userId.StartsWith("ADM"))
+        //     {
+        //         // If the user is an Admin, fetch all orders
+        //         allOrders = await _orderRepository.GetAllOrdersAsync();
+        //     }
+        //     else if (userId.StartsWith("VEN"))
+        //     {
+        //         // If the user is a Vendor, fetch the order items related to this vendor
+        //         var vendorOrderItems = await _orderItemRepository.GetOrderItemsByVendorIdAsync(userId);
+
+        //         // Extract distinct OrderIds from the order items
+        //         var orderIds = vendorOrderItems.Select(oi => oi.OrderId).Distinct().ToList();
+
+        //         // Fetch the orders associated with these OrderIds
+        //         allOrders = await _orderRepository.GetOrdersByIdsAsync(orderIds);
+        //     }
+        //     else
+        //     {
+        //         return BadRequest("Invalid user role. Only 'ADM' or 'VEN' roles are allowed.");
+        //     }
+
+        //     // If no orders were found
+        //     if (allOrders == null || !allOrders.Any())
+        //     {
+        //         return NotFound($"No orders found for User ID {userId}.");
+        //     }
+
+        //     var ordersResponse = new List<object>();
+
+        //     // Iterate through each order
+        //     foreach (var order in allOrders)
+        //     {
+        //         // Fetch the order items for the current order
+        //         var orderItems = await _orderItemRepository.GetOrderItemsByOrderIdAsync(order.OrderId);
+
+        //         List<OrderItem> relevantOrderItems;
+
+        //         if (userId.StartsWith("ADM"))
+        //         {
+        //             // If Admin, include all order items
+        //             relevantOrderItems = orderItems.ToList();
+        //         }
+        //         else
+        //         {
+        //             // If Vendor, filter the order items by the given VendorId
+        //             relevantOrderItems = orderItems.Where(item => item.VendorId == userId).ToList();
+        //         }
+
+        //         // If no relevant items in the order, skip the order
+        //         if (!relevantOrderItems.Any())
+        //         {
+        //             continue;
+        //         }
+
+        //         // Construct the order response only with the relevant order items
+        //         var orderResponse = new
+        //         {
+        //             order.Id,
+        //             order.OrderId,
+        //             order.CustomerId,
+        //             order.TotalPrice,
+        //             order.Status,
+        //             order.Note,
+        //             order.CreatedDate,
+        //             order.UpdatedDate,
+        //             OrderItems = await Task.WhenAll(relevantOrderItems.Select(async item =>
+        //             {
+        //                 // Fetch the product details for the image URL
+        //                 var product = await _productRepository.GetByCustomIdAsync(item.ProductId);
+
+        //                 return new
+        //                 {
+        //                     item.Id,
+        //                     item.OrderId,
+        //                     item.ProductId,
+        //                     item.ProductName,
+        //                     item.VendorId,
+        //                     item.Quantity,
+        //                     item.Price,
+        //                     item.Status,
+        //                     ImageUrl = product?.ImageUrls?.FirstOrDefault(), // Fetch the image URL
+        //                     item.CreatedDate,
+        //                     item.UpdatedDate
+        //                 };
+        //             }))
+        //         };
+
+        //         // Add the order response with the relevant order items to the final response list
+        //         ordersResponse.Add(orderResponse);
+        //     }
+
+        //     // If no orders with relevant items were found
+        //     if (!ordersResponse.Any())
+        //     {
+        //         return NotFound($"No relevant orders found for User ID {userId}.");
+        //     }
+
+        //     // Return the filtered orders
+        //     return Ok(ordersResponse);
+        // }
+
+
+        // Get orders by role (Admin, Vendor, or CSR)
         [HttpGet("getByRole/{userId}")]
         public async Task<IActionResult> GetOrdersByUserRole(string userId)
         {
             List<Order> allOrders;
 
             // Check the first three letters of the userId to determine the role
-            if (userId.StartsWith("ADM"))
+            if (userId.StartsWith("ADM") || userId.StartsWith("CSR"))
             {
-                // If the user is an Admin, fetch all orders
+                // If the user is an Admin or CSR, fetch all orders
                 allOrders = await _orderRepository.GetAllOrdersAsync();
             }
             else if (userId.StartsWith("VEN"))
@@ -252,7 +361,7 @@ namespace api.Controllers
             }
             else
             {
-                return BadRequest("Invalid user role. Only 'ADM' or 'VEN' roles are allowed.");
+                return BadRequest("Invalid user role. Only 'ADM', 'CSR', or 'VEN' roles are allowed.");
             }
 
             // If no orders were found
@@ -271,9 +380,9 @@ namespace api.Controllers
 
                 List<OrderItem> relevantOrderItems;
 
-                if (userId.StartsWith("ADM"))
+                if (userId.StartsWith("ADM") || userId.StartsWith("CSR"))
                 {
-                    // If Admin, include all order items
+                    // If Admin or CSR, include all order items
                     relevantOrderItems = orderItems.ToList();
                 }
                 else
@@ -334,7 +443,6 @@ namespace api.Controllers
             // Return the filtered orders
             return Ok(ordersResponse);
         }
-
 
         // // Get orders by VendorId
         // [HttpGet("getByVendorId/{vendorId}")]

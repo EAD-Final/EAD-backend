@@ -64,16 +64,33 @@ namespace api.Services
             return await _orders.Find(filter).ToListAsync();
         }
 
+        // // Get order by custom Order ID
+        // public async Task<Order?> GetOrderByOrderIdAsync(string orderId)
+        // {
+        //     return await _orders.Find(order => order.OrderId == orderId).FirstOrDefaultAsync();
+        // }
+
         // Get order by custom Order ID
         public async Task<Order?> GetOrderByOrderIdAsync(string orderId)
         {
-            return await _orders.Find(order => order.OrderId == orderId).FirstOrDefaultAsync();
+            var filter = Builders<Order>.Filter.And(
+                Builders<Order>.Filter.Eq(order => order.OrderId, orderId),
+                Builders<Order>.Filter.Ne(order => order.Status, "Deleted")
+            );
+
+            return await _orders.Find(filter).FirstOrDefaultAsync();
         }
 
-        // Get Orders by a list of Order IDs
+        // // Get Orders by a list of Order IDs
+        // public async Task<List<Order>> GetOrdersByIdsAsync(List<string> orderIds)
+        // {
+        //     return await _orders.Find(o => orderIds.Contains(o.OrderId)).ToListAsync();
+        // }
+
+        // Get Orders by a list of Order IDs, excluding orders with status "Deleted"
         public async Task<List<Order>> GetOrdersByIdsAsync(List<string> orderIds)
         {
-            return await _orders.Find(o => orderIds.Contains(o.OrderId)).ToListAsync();
+            return await _orders.Find(o => orderIds.Contains(o.OrderId) && o.Status != "Deleted").ToListAsync();
         }
 
 
